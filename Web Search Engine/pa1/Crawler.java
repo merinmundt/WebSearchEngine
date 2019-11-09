@@ -57,6 +57,8 @@ public class Crawler
 	  while(!Q.isEmpty()) {
 		  do {
 			  String cur = Q.peek();
+			  //checks if current node is past max depth
+			  //if()
 			  Document doc = Jsoup.connect(cur).get();
 			  Elements links = doc.select("a[href]");
 			  for (Element link : links) {
@@ -77,8 +79,9 @@ public class Crawler
 			  Q.remove();
 		  }
 	  }
-	  return null;
+	  return webGraph;
   }
+  
   //Method to add edge 
   public void addEdge() {
 	  
