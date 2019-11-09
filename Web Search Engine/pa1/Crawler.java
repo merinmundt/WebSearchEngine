@@ -1,5 +1,8 @@
 package pa1;
 
+import java.util.List;
+import java.util.Queue;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -16,6 +19,7 @@ public class Crawler
 	String _seedUrl;
 	int _maxDepth;
 	int _maxPages;
+
 	
   /**
    * Constructs a Crawler that will start with the given seed url, including
@@ -42,25 +46,35 @@ public class Crawler
   public Graph<String> crawl()
   {
 	  Graph<String> webGraph;
+	  Queue<String> Q;
+	  List<String> list = new ArrayList<String>(); 
 	  int counter = 0;
-	  int counter1 = 0;
-	  int counter2 = 0;
-	  int counter3 = 0;
-	  //Extracting the links
-	  Document doc = Jsoup.connect(_seedUrl).get();
-	  Elements links = doc.select("a[href]");
-	  for (Element link : links) {
-		  if(!Util.ignoreLink(_seedUrl, link)) {
-			  	counter++;
-			  	if(counter > 6) {
-			  		break;
-			  	}
-			  	Document doc1 = Jsoup.connect(link).get();
-			  	Elements links1 = doc1.select("a[href]");
-			  	fo
-			  
+	  String root = _seedUrl;
+	  
+	  Q.add(root);
+	  list.add(root);
+	  
+	  while(!Q.isEmpty()) {
+		  do {
+			  String cur = Q.peek();
+			  Document doc = Jsoup.connect(cur).get();
+			  Elements links = doc.select("a[href]");
+			  for (Element link : links) {
+				  if(!Util.ignoreLink(cur, link)) {
+					  if(!list.contains(link)) {
+						  Q.add(link);
+						  list.add(link);
+						  counter++
+					  }
+					  if(counter > _maxPages) {
+						  break;
+					  }
+				  }  
+			  }
+			  Q.remove();
 		  }
 	  }
 	  return null;
   }
+ 
 }
