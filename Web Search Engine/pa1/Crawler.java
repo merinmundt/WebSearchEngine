@@ -65,16 +65,23 @@ public class Crawler
 						  Q.add(link);
 						  list.add(link);
 						  counter++
+						  if(counter > _maxPages) {
+							  break;
+						  }
+						  addEdge(cur, link);
+						  
 					  }
-					  if(counter > _maxPages) {
-						  break;
-					  }
+					
 				  }  
 			  }
 			  Q.remove();
 		  }
 	  }
 	  return null;
+  }
+  //Method to add edge 
+  public void addEdge() {
+	  
   }
  
 }
