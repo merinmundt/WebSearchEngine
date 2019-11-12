@@ -46,7 +46,13 @@ public class MyGraph<E> extends Graph<E> {
    *   list of outgoing edges
    */
 	@Override
-	public List<Integer> getNeighbors(int index);
+	public List<Integer> getNeighbors(int index){
+		ArrayList<E> cur = this.vertexData();
+		ArrayList<E> neighbors = new ArrayList<E>();
+		for(int i = 0; i < cur.size(); i++) {
+			
+		}
+	}
   
   /**
    * Returns a list of incoming edges, that is, a list of indices for vertices 
