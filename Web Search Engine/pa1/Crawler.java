@@ -1,12 +1,16 @@
 package pa1;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
+import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
-
-import api.Graph;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Implementation of a basic web crawler that creates a graph of some
@@ -45,46 +49,82 @@ public class Crawler
    */
   public Graph<String> crawl()
   {
-	  Graph<String> webGraph;
-	  Queue<String> Q;
-	  List<String> list = new ArrayList<String>(); 
-	  int counter = 0;
+	  MyGraph webGraph = new MyGraph();
+	  Queue<UrlAndDepth> Q = new LinkedList<UrlAndDepth>();
+	  List<String> discovered = new ArrayList<String>(); 
+	  int pageCounter = 0;
+	  int webhitCounter = 1;
 	  String root = _seedUrl;
 	  
-	  Q.add(root);
-	  list.add(root);
+	  Q.add(new UrlAndDepth(root, 0));
+	  discovered.add(root);
 	  
-	  while(!Q.isEmpty()) {
-		  do {
-			  String cur = Q.peek();
-			  //checks if current node is past max depth
-			  //if()
-			  Document doc = Jsoup.connect(cur).get();
-			  Elements links = doc.select("a[href]");
-			  for (Element link : links) {
-				  if(!Util.ignoreLink(cur, link)) {
-					  if(!list.contains(link)) {
-						  Q.add(link);
-						  list.add(link);
-						  counter++
-						  if(counter > _maxPages) {
-							  break;
-						  }
-						  addEdge(cur, link);
-						  
-					  }
-					
-				  }  
-			  }
-			  Q.remove();
-		  }
+	  while(!Q.isEmpty() && pageCounter <= this._maxPages) 
+	  {
+			UrlAndDepth curUrlAndDepth = Q.peek();
+			if(curUrlAndDepth.Depth > _maxDepth){
+				break;
+			}
+			String cur = curUrlAndDepth.Url;
+			//checks if we are at 50 consecutive webhits
+			if(webhitCounter % 50 == 0){
+				waitthree();
+			}
+			Document doc = Jsoup.connect(cur).get();
+			webhitCounter++;
+			Elements links = doc.select("a[href]");
+			for (Element link : links) 
+			{
+				String v = link.attr("abs:href");
+				Document temp = null;
+				if(!Util.ignoreLink(cur, v)) 
+				{
+					try
+					{
+						//checks if we are at 50 consecutive webhits
+						if(webhitCounter % 50 == 0){
+							waitthree();
+						}
+						temp = Jsoup.connect(v).get();
+					}
+					catch (UnsupportedMimeTypeException e)
+					{
+						System.out.println("--unsupported document type, do nothing");
+					} 
+					catch (HttpStatusException  e)
+					{
+						System.out.println("--invalid link, do nothing");
+					}
+					if(!discovered.contains(v)) 
+					{
+						Q.add(new UrlAndDepth(v, curUrlAndDepth.Depth + 1));
+						discovered.add(v);
+						pageCounter++;
+						webGraph.addEdge(cur, v);
+						
+					}
+					webhitCounter++;
+				
+				}  
+			}
+			Q.remove();
 	  }
 	  return webGraph;
   }
   
-  //Method to add edge 
-  public void addEdge() {
-	  
-  }
  
+  private void waitthree()
+  {
+	try 
+	{ 
+		Thread.sleep(3000); 
+	} 
+	catch (InterruptedException ignore) 
+	{ 
+
+	}
+
+  }
+
+  
 }
