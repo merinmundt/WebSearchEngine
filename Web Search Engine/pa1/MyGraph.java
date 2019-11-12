@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyGraph<E> extends Graph<E> {
+public class MyGraph<E> implements Graph<E> {
 	
 	
    /**
