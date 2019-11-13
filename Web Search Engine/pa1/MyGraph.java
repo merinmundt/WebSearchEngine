@@ -1,11 +1,19 @@
+package pa1;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import api.Graph;
+import api.TaggedVertex;
+
 import java.util.HashMap;
 
-/** @author Merin Mundt
- * This class is the class that implements the graph interface 
- * Helps with the implementation of Crawler and index class
+/**
+ * 
+ * @author Merin Mundt
+ *
+ *This class implements the graph interface to be used in Crawler and index
  */
 
 public class MyGraph implements Graph<String> {

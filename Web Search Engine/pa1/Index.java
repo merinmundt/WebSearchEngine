@@ -3,6 +3,7 @@ package pa1;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -17,6 +18,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import api.TaggedVertex;
+import api.Util;
 
 /**
  * Implementation of an inverted index for a web graph.
@@ -26,20 +28,21 @@ import api.TaggedVertex;
 public class Index
 {
   //Map to hold the urls and their indegrees
-  private Map<String, Integer> _urlMap = new HashMap<String, Integer>;
+  private Map<String, Integer> _urlMap = new HashMap<String, Integer>();
   /**
    * Constructs an index from the given list of urls.  The
    * tag value for each url is the indegree of the corresponding
    * node in the graph to be indexed.
    * @param urls
    *   information about graph to be indexed
+ * @throws IOException 
    */
-  public Index(List<TaggedVertex<String>> urls)
+  public Index(List<TaggedVertex<String>> urls) throws IOException
   {
     for(TaggedVertex<String> url: urls){
       _urlMap.put(url.getVertexData(), url.getTagValue());
     }
-    makeIndex();
+    this.makeIndex();
   }
 
   private void waitthree()
@@ -60,10 +63,10 @@ public class Index
    */
 
 /**
- * data structure to hold each url and its list of words with # occurences
+ * data structure to hold each url and its list of words with occurrences
  */
   private Map<String, Map<String, Integer>> _indexMap = new HashMap<String, Map<String, Integer>>();
-  public void makeIndex()
+  public void makeIndex() throws IOException
   {
     int webhits = 0;
     for(Entry<String, Integer> urlEntry: _urlMap.entrySet()){
@@ -78,11 +81,14 @@ public class Index
       while(sc.hasNext()){
         String word = sc.next();
         word = Util.stripPunctuation(word);
-        if(!Util.isStopWord(word)){
+        if(!Util.isStopWord(word) && word.length() > 0){
+          System.out.println("adding word " + word);
           wordMap.putIfAbsent(word, 0);
           wordMap.put(word, wordMap.get(word) + 1);
         }
       }
+      sc.close();
+      _indexMap.put(urlEntry.getKey(), wordMap);
     }
   }
   

@@ -1,9 +1,12 @@
 package pa1;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import javax.net.ssl.SSLHandshakeException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.UnsupportedMimeTypeException;
@@ -11,6 +14,9 @@ import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import api.Graph;
+import api.Util;
 
 /**
  * Implementation of a basic web crawler that creates a graph of some
@@ -46,8 +52,9 @@ public class Crawler
    * implied by maxDepth and maxPages.  
    * @return
    *   an instance of Graph representing this portion of the web
+ * @throws IOException 
    */
-  public Graph<String> crawl()
+  public Graph<String> crawl() throws IOException
   {
 	  MyGraph webGraph = new MyGraph();
 	  Queue<UrlAndDepth> Q = new LinkedList<UrlAndDepth>();
@@ -70,6 +77,7 @@ public class Crawler
 			if(webhitCounter % 50 == 0){
 				waitthree();
 			}
+			System.out.println("Crawling " + cur);
 			Document doc = Jsoup.connect(cur).get();
 			webhitCounter++;
 			Elements links = doc.select("a[href]");
@@ -77,33 +85,41 @@ public class Crawler
 			{
 				String v = link.attr("abs:href");
 				Document temp = null;
-				if(!Util.ignoreLink(cur, v)) 
+				if(!Util.ignoreLink(cur, v) && !v.endsWith("#")) 
 				{
-					try
-					{
-						//checks if we are at 50 consecutive webhits
-						if(webhitCounter % 50 == 0){
-							waitthree();
+					if(!discovered.contains(v)) {
+						try
+						{
+							//checks if we are at 50 consecutive webhits
+							if(webhitCounter % 50 == 0){
+								waitthree();
+							}
+							System.out.println("Checking Link: " + v);
+							temp = Jsoup.connect(v).get();
+							Q.add(new UrlAndDepth(v, curUrlAndDepth.Depth + 1));
+							discovered.add(v);
+							pageCounter++;
+							webGraph.addEdge(cur, v);
+								
+							
+							webhitCounter++;
 						}
-						temp = Jsoup.connect(v).get();
-					}
-					catch (UnsupportedMimeTypeException e)
-					{
-						System.out.println("--unsupported document type, do nothing");
-					} 
-					catch (HttpStatusException  e)
-					{
-						System.out.println("--invalid link, do nothing");
-					}
-					if(!discovered.contains(v)) 
-					{
-						Q.add(new UrlAndDepth(v, curUrlAndDepth.Depth + 1));
-						discovered.add(v);
-						pageCounter++;
-						webGraph.addEdge(cur, v);
+						catch (UnsupportedMimeTypeException e)
+						{
+							System.out.println("--unsupported document type, do nothing");
+						} 
+						catch (HttpStatusException  e)
+						{
+							System.out.println("--invalid link, do nothing");
+						}
+						catch(SSLHandshakeException e) {
+							System.out.println("--invalid link, do nothing");
+						}
+						
+						
 						
 					}
-					webhitCounter++;
+					
 				
 				}  
 			}

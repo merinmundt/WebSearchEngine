@@ -1,3 +1,5 @@
+package pa1;
+import java.lang.Comparable;
 /**
  * 
  * @author Merin Mundt
