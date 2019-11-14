@@ -77,7 +77,7 @@ public class Index
       }
       Element body = Jsoup.connect(urlEntry.getKey()).get().body();
       webhits++;
-      if(body != NULL) {
+      if(body != null) {
 	      Scanner sc = new Scanner(body.text());
 	      while(sc.hasNext()){
 	        String word = sc.next();
