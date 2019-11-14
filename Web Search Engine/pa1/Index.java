@@ -75,20 +75,22 @@ public class Index
       if(webhits % 50 == 0){
         waitthree();
       }
-      String body = Jsoup.connect(urlEntry.getKey()).get().body().text();
+      Element body = Jsoup.connect(urlEntry.getKey()).get().body();
       webhits++;
-      Scanner sc = new Scanner(body);
-      while(sc.hasNext()){
-        String word = sc.next();
-        word = Util.stripPunctuation(word);
-        if(!Util.isStopWord(word) && word.length() > 0){
-          System.out.println("adding word " + word);
-          wordMap.putIfAbsent(word, 0);
-          wordMap.put(word, wordMap.get(word) + 1);
-        }
+      if(body != NULL) {
+	      Scanner sc = new Scanner(body.text());
+	      while(sc.hasNext()){
+	        String word = sc.next();
+	        word = Util.stripPunctuation(word);
+	        if(!Util.isStopWord(word) && word.length() > 0){
+	          System.out.println("adding word " + word);
+	          wordMap.putIfAbsent(word, 0);
+	          wordMap.put(word, wordMap.get(word) + 1);
+	        }
+	      }
+	      sc.close();
+	      _indexMap.put(urlEntry.getKey(), wordMap);
       }
-      sc.close();
-      _indexMap.put(urlEntry.getKey(), wordMap);
     }
   }
   

@@ -65,7 +65,9 @@ public class Crawler
 	  
 	  Q.add(new UrlAndDepth(root, 0));
 	  discovered.add(root);
-	  
+	  //add an edge to that the seedurl gets an incoming edge
+      webGraph.addEdge(root, root);
+      
 	  while(!Q.isEmpty() && pageCounter <= this._maxPages) 
 	  {
 			UrlAndDepth curUrlAndDepth = Q.peek();
@@ -114,6 +116,9 @@ public class Crawler
 						}
 						catch(SSLHandshakeException e) {
 							System.out.println("--invalid link, do nothing");
+						}
+						catch (IOException e) {
+							System.out.println("link does not include http or https");
 						}
 						
 						

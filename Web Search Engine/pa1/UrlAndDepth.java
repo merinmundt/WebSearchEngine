@@ -1,7 +1,7 @@
 package pa1;
 /**
  * 
- * @author merinmundt
+ * @author Merin Mundt
  *
  *This class implements the depth that must be met within the graph
  */
